@@ -418,15 +418,26 @@ fun ObjectTypeInput(
         for ((propName, propType) in dataType.properties) {
             val isPropRequired = dataType.required.contains(propName)
             val propValue = value[propName] ?: createDefaultValue(propType)
-            AppFunctionDataTypeInput(
-                dataType = propType,
-                value = propValue,
-                onValueChange = { valValue -> onValueChange(value + (propName to valValue)) },
-                components = components,
-                label = propName,
-                isRequired = isPropRequired,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
+            Column {
+                AppFunctionDataTypeInput(
+                    dataType = propType,
+                    value = propValue,
+                    onValueChange = { valValue -> onValueChange(value + (propName to valValue)) },
+                    components = components,
+                    label = propName,
+                    isRequired = isPropRequired,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
+                // Property description (from the app's KDoc).
+                if (propType.description.isNotBlank()) {
+                    Text(
+                        text = propType.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+                    )
+                }
+            }
         }
     }
 }

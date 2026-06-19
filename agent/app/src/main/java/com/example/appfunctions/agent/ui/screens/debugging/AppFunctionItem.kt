@@ -222,15 +222,37 @@ fun AppFunctionItem(
                 exit = shrinkVertically() + fadeOut(),
             ) {
                 Column(modifier = Modifier.padding(end = 8.dp)) {
-                    if (function.parameters.isNotEmpty()) {
+                    val hasDescription = function.description.isNotBlank()
+                    val hasReturnDescription = function.response.description.isNotBlank()
+                    val hasParameters = function.parameters.isNotEmpty()
+
+                    if (hasDescription || hasParameters || hasReturnDescription) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 16.dp),
                             color = MaterialTheme.colorScheme.outlineVariant,
                         )
+                    }
+
+                    // Function description (from the app's KDoc).
+                    if (hasDescription) {
+                        Text(
+                            text = function.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+
+                    if (hasParameters) {
+                        if (hasDescription) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        SectionLabel(text = stringResource(R.string.debugging_parameters))
 
                         // Parameters List
                         Column(
-                            modifier = Modifier.alpha(if (function.isEnabled) 1f else 0.6f),
+                            modifier =
+                                Modifier.alpha(if (function.isEnabled) 1f else 0.6f)
+                                    .padding(top = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             for (parameter in function.parameters) {
@@ -239,6 +261,7 @@ fun AppFunctionItem(
                                         ?: createDefaultValue(parameter.dataType)
                                 ParameterInput(
                                     name = parameter.name,
+                                    description = parameter.description,
                                     dataType = parameter.dataType,
                                     isRequired = parameter.isRequired,
                                     value = currentValue,
@@ -251,6 +274,18 @@ fun AppFunctionItem(
                                 )
                             }
                         }
+                    }
+
+                    // Return value description (from the app's KDoc).
+                    if (hasReturnDescription) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SectionLabel(text = stringResource(R.string.debugging_returns))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = function.response.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -277,23 +312,45 @@ fun AppFunctionItem(
 }
 
 @Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Composable
 private fun ParameterInput(
     name: String,
+    description: String,
     dataType: AppFunctionDataTypeMetadata,
     isRequired: Boolean,
     value: Any?,
     onValueChange: (Any) -> Unit,
     components: AppFunctionComponentsMetadata,
 ) {
-    AppFunctionDataTypeInput(
-        dataType = dataType,
-        value = value,
-        onValueChange = onValueChange,
-        components = components,
-        label = name,
-        modifier = Modifier.padding(vertical = 4.dp),
-        isRequired = isRequired,
-    )
+    Column {
+        AppFunctionDataTypeInput(
+            dataType = dataType,
+            value = value,
+            onValueChange = onValueChange,
+            components = components,
+            label = name,
+            modifier = Modifier.padding(vertical = 4.dp),
+            isRequired = isRequired,
+        )
+        // Parameter description (from the app's KDoc).
+        if (description.isNotBlank()) {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

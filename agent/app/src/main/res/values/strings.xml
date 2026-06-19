@@ -38,6 +38,7 @@
     <string name="debugging_functions_for_app">Functions for %1$s:</string>
     <string name="debugging_invoke">Run</string>
     <string name="debugging_parameters">Parameters</string>
+    <string name="debugging_returns">Returns</string>
     <string name="debugging_required_indicator">*</string>
     <string name="debugging_expand_function">Expand function</string>
     <string name="debugging_collapse_function">Collapse function</string>
